@@ -1,39 +1,40 @@
-annotated-types @ file:///home/conda/feedstock_root/build_artifacts/annotated-types_1733247046149/work
-anyio @ file:///home/conda/feedstock_root/build_artifacts/anyio_1736174388474/work
-certifi @ file:///home/conda/feedstock_root/build_artifacts/certifi_1734380492396/work/certifi
-click @ file:///home/conda/feedstock_root/build_artifacts/click_1734858813237/work
-dnspython @ file:///home/conda/feedstock_root/build_artifacts/dnspython_1733256735222/work
-email_validator @ file:///home/conda/feedstock_root/build_artifacts/email-validator-meta_1733300719943/work
-exceptiongroup @ file:///home/conda/feedstock_root/build_artifacts/exceptiongroup_1733208806608/work
-fastapi @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_fastapi_1738326226/work
-fastapi-cli @ file:///home/conda/feedstock_root/build_artifacts/fastapi-cli_1734302308128/work
-h11 @ file:///home/conda/feedstock_root/build_artifacts/h11_1733327467879/work
-h2 @ file:///home/conda/feedstock_root/build_artifacts/h2_1738578511449/work
-hpack @ file:///home/conda/feedstock_root/build_artifacts/hpack_1737618293087/work
-httpcore @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_httpcore_1731707562/work
-httptools @ file:///Users/runner/miniforge3/conda-bld/httptools_1732707712903/work
-httpx @ file:///home/conda/feedstock_root/build_artifacts/httpx_1733663348460/work
-hyperframe @ file:///home/conda/feedstock_root/build_artifacts/hyperframe_1737618333194/work
-idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1733211830134/work
-Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1734823942230/work
-markdown-it-py @ file:///home/conda/feedstock_root/build_artifacts/markdown-it-py_1733250460757/work
-MarkupSafe @ file:///Users/runner/miniforge3/conda-bld/markupsafe_1733219703897/work
-mdurl @ file:///home/conda/feedstock_root/build_artifacts/mdurl_1733255585584/work
-pydantic @ file:///home/conda/feedstock_root/build_artifacts/pydantic_1737761369378/work
-pydantic_core @ file:///Users/runner/miniforge3/conda-bld/pydantic-core_1734571602332/work
-Pygments @ file:///home/conda/feedstock_root/build_artifacts/pygments_1736243443484/work
-python-dotenv @ file:///home/conda/feedstock_root/build_artifacts/python-dotenv_1733243180666/work
-python-multipart @ file:///home/conda/feedstock_root/build_artifacts/python-multipart_1734420773152/work
-PyYAML @ file:///Users/runner/miniforge3/conda-bld/pyyaml_1737454709251/work
-rich @ file:///home/conda/feedstock_root/build_artifacts/rich_1733342254348/work/dist
-rich-toolkit @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_rich-toolkit_1733750834/work
-shellingham @ file:///home/conda/feedstock_root/build_artifacts/shellingham_1733300899265/work
-sniffio @ file:///home/conda/feedstock_root/build_artifacts/sniffio_1733244044561/work
-starlette @ file:///home/conda/feedstock_root/build_artifacts/starlette_1737823930525/work
+annotated-types==0.7.0
+anyio==4.8.0
+certifi==2024.12.14
+click==8.1.8
+dnspython==2.7.0
+email_validator==2.2.0
+exceptiongroup==1.2.2
+fastapi==0.115.8
+fastapi-cli==0.0.7
+h11==0.14.0
+h2==4.2.0
+hpack==4.1.0
+httpcore==1.0.7
+httptools==0.6.4
+httpx==0.28.1
+hyperframe==6.1.0
+idna==3.10
+Jinja2==3.1.5
+markdown-it-py==3.0.0
+MarkupSafe==3.0.2
+mdurl==0.1.2
+pip==25.0.1
+pydantic==2.10.6
+pydantic_core==2.27.2
+Pygments==2.19.1
+python-dotenv==1.0.1
+python-multipart==0.0.20
+PyYAML==6.0.2
+rich==13.9.4
+rich-toolkit==0.11.3
+shellingham==1.5.4
+sniffio==1.3.1
+starlette==0.45.3
 typer==0.15.1
 typer-slim==0.15.1
-typing_extensions @ file:///home/conda/feedstock_root/build_artifacts/typing_extensions_1733188668063/work
-uvicorn @ file:///home/conda/feedstock_root/build_artifacts/uvicorn_1734292939144/work
-uvloop @ file:///Users/runner/miniforge3/conda-bld/uvloop_1730214403293/work
-watchfiles @ file:///Users/runner/miniforge3/conda-bld/watchfiles_1736550525571/work
-websockets @ file:///Users/runner/miniforge3/conda-bld/websockets_1737358200814/work
+typing_extensions==4.12.2
+uvicorn==0.34.0
+uvloop==0.21.0
+watchfiles==1.0.4
+websockets==14.2
