@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from datetime import datetime
+from pydantic import BaseModel
 app = FastAPI()
 
 app.add_middleware(
@@ -11,6 +12,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/api/hello")
 def read_root():
     return {"message": "Hello from FastAPI!"}
+
+@app.get("/api/time")
+def read_root():
+    return {"time": datetime.now().isoformat()}
+
+class EchoRequest(BaseModel):
+    text: str
+    number: int
+
+@app.post("/api/echo")
+def echo(request: EchoRequest):
+    return {"message": request.text, "number": request.number}
