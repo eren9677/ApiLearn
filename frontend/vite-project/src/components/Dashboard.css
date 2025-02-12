@@ -5,18 +5,23 @@
   margin: 0 auto;
   position: relative;
   padding: 2rem;
+  transition: margin-right 0.3s ease;
+}
+
+.dashboard-container.sidebar-open {
+  margin-right: 300px;
 }
 
 /* Header section with logout button */
-.dashboard-header {
+/* .dashboard-header {
   position: fixed;
   top: 2rem;
   right: 2rem;
   z-index: 1000;
-}
+} */
 
 /* Logout button styling */
-.logout-button {
+/* .logout-button {
   padding: 0.75rem 1.5rem;
   background-color: #f44336;
   color: white;
@@ -30,7 +35,7 @@
 .logout-button:hover {
   background-color: #d32f2f;
   transform: translateY(-1px);
-}
+} */
 
 /* API section styling */
 .api-section {
@@ -138,9 +143,36 @@
     margin-bottom: 1rem;
   }
 
-  .dashboard-header {
+  /* Remove this block */
+  /* .dashboard-header {
     position: static;
     margin-bottom: 2rem;
     text-align: right;
-  }
-} 
+  } */
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 997;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+}

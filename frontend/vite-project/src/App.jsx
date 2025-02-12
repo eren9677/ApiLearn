@@ -13,7 +13,6 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1 className="app-title">FastAPI & React Example</h1>
 
       {!isLoggedIn ? (
         <Auth onLoginSuccess={() => setIsLoggedIn(true)} />

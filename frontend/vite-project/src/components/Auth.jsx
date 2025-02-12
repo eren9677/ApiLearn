@@ -46,6 +46,7 @@ function Auth({ onLoginSuccess }) {
       
       // Store token and update app state on success
       localStorage.setItem("token", data.access_token);
+      localStorage.setItem("username", username);
       onLoginSuccess();
       
       // Clear form fields
@@ -60,6 +61,7 @@ function Auth({ onLoginSuccess }) {
   return (
     // Main container for the auth form
     <div className="auth-container">
+      <h1 className="app-title">FastAPI & React Example</h1>
       {/* Form title that changes based on mode */}
       <h2 className="auth-title">
         {isSignup ? "Create Account" : "Welcome Back"}

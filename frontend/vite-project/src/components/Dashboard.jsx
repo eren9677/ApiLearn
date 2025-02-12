@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-// Import the separate CSS file for Dashboard component
+// Import components and styles
+import Sidebar from './Sidebar';
 import './Dashboard.css';
 
 function Dashboard({ onLogout }) {
+  // Add state for sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Get username from localStorage or use default
+  const username = localStorage.getItem("username") || "User";
+
   // State management for API responses and user inputs
   const [helloResponse, setHelloResponse] = useState("");
   const [timeResponse, setTimeResponse] = useState("");
@@ -58,14 +65,22 @@ function Dashboard({ onLogout }) {
   };
 
   return (
-    // Main dashboard container
     <div className="dashboard-container">
-      {/* Header with Logout Button */}
-      <div className="dashboard-header">
-        <button onClick={onLogout} className="logout-button">
-          Logout
-        </button>
-      </div>
+      {/* Sidebar toggle button */}
+      <button 
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(true)}
+      >
+        ☰
+      </button>
+
+      {/* Sidebar component */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        username={username}
+        onLogout={onLogout}
+      />
 
       {/* Hello API Section */}
       <div className="api-section">
@@ -137,4 +152,4 @@ function Dashboard({ onLogout }) {
   );
 }
 
-export default Dashboard; 
+export default Dashboard;
