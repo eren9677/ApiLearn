@@ -61,31 +61,37 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def signup(user: UserCreate, db: mysql.connector.MySQLConnection = Depends(get_db)):
     cursor = db.cursor(dictionary=True)
     
-    # Check if username exists
+    # Check if username is already taken in the database
     cursor.execute("SELECT username FROM users WHERE username = %s", (user.username,))
     if cursor.fetchone():
         raise HTTPException(
             status_code=400,
-            detail="Username already registered"
+            detail="This username is already taken"
         )
     
-    # Check if email exists
+    # Check if email is already registered in the database
     cursor.execute("SELECT email FROM users WHERE email = %s", (user.email,))
     if cursor.fetchone():
         raise HTTPException(
             status_code=400,
-            detail="Email already registered"
+            detail="An account with this email already exists"
         )
     
-    # Create new user
-    hashed_password = get_password_hash(user.password)
-    cursor.execute(
-        "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
-        (user.username, user.email, hashed_password)
-    )
-    db.commit()
+    # If both checks pass, create new user with hashed password
+    try:
+        hashed_password = get_password_hash(user.password)
+        cursor.execute(
+            "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+            (user.username, user.email, hashed_password)
+        )
+        db.commit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create account. Please try again."
+        )
     
-    # Create access token
+    # Generate JWT token for the new user
     access_token = create_access_token(
         data={"sub": user.username},
         expires_delta=timedelta(minutes=30)
@@ -95,19 +101,31 @@ async def signup(user: UserCreate, db: mysql.connector.MySQLConnection = Depends
 @app.post("/api/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: mysql.connector.MySQLConnection = Depends(get_db)):
     cursor = db.cursor(dictionary=True)
+    
+    # Check if user exists in database
     cursor.execute(
         "SELECT * FROM users WHERE username = %s",
         (form_data.username,)
     )
     user = cursor.fetchone()
     
-    if not user or not verify_password(form_data.password, user["password_hash"]):
+    # Return error if username not found
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Username not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    # Verify password against stored hash
+    if not verify_password(form_data.password, user["password_hash"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Generate JWT token for successful login
     access_token = create_access_token(
         data={"sub": user["username"]},
         expires_delta=timedelta(minutes=30)
