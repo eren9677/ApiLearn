@@ -41,3 +41,5 @@ watchfiles==1.0.4
 websockets==14.2
 passlib[bcrypt]
 mysql-connector-python
+qrcode[pil]
+pillow>=10.0.0

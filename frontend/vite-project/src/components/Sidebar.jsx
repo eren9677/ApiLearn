@@ -3,6 +3,16 @@ import './Sidebar.css';
 
 // Sidebar component that shows user info and logout button
 function Sidebar({ isOpen, onClose, username, onLogout }) {
+  // Function to handle navigation without page refresh
+  const handleNavigation = (path) => {
+    // Prevent default navigation behavior
+    window.history.pushState({}, '', path);
+    // Dispatch a navigation event so the App component can handle the route change
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    // Close the sidebar after navigation
+    onClose();
+  };
+
   return (
     <>
       {/* Overlay that appears behind the sidebar */}
@@ -30,6 +40,24 @@ function Sidebar({ isOpen, onClose, username, onLogout }) {
 
         {/* Sidebar navigation/actions */}
         <div className="sidebar-actions">
+          {/* QR Code Management Section */}
+          <div className="sidebar-section">
+            <h4 className="sidebar-section-title">QR Code Management</h4>
+            <button 
+              className="sidebar-button" 
+              onClick={() => handleNavigation('/create-qr')}
+            >
+              Create QR
+            </button>
+            <button 
+              className="sidebar-button" 
+              onClick={() => handleNavigation('/manage-qr')}
+            >
+              Manage QRs
+            </button>
+          </div>
+          
+          {/* Logout button */}
           <button className="sidebar-logout" onClick={onLogout}>
             Logout
           </button>

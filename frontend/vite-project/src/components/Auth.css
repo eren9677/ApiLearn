@@ -1,33 +1,30 @@
 /* Container for the authentication form */
 .auth-container {
   width: 90%;
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem 3rem;
+  max-width: 500px;
+  padding: 1.5rem 2.5rem;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Add a full-screen background overlay */
-.auth-container::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent grey */
-  z-index: -1;
+  /* Adjust positioning */
+  position: absolute;
+  top: 35%; /* Changed from 50% to move it higher */
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* Form title styling */
 .auth-title {
   color: #333;
-  margin-bottom: 2rem;
-  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 600;
   text-align: center;
+}
+
+.app-title {
+  font-size: 2rem;
+  margin: 1.5rem 0;
 }
 
 /* Form layout */

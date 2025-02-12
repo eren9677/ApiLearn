@@ -6,6 +6,45 @@ from typing import Optional
 from pydantic import BaseModel
 import mysql.connector
 from .auth import verify_password, get_password_hash, create_access_token
+import qrcode
+import io
+import base64
+from PIL import Image
+from jose import JWTError, jwt
+
+# Constants for JWT
+SECRET_KEY = "your-secret-key-here"  # In production, use a secure secret key
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# OAuth2 scheme for token handling
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Function to decode and verify JWT token
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """
+    Verify and decode JWT token to get current user
+    Args:
+        token: JWT token from request
+    Returns:
+        username: String containing the username from token
+    Raises:
+        HTTPException: If token is invalid or expired
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        # Decode JWT token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        return username
+    except JWTError:
+        raise credentials_exception
 
 app = FastAPI()
 
@@ -54,8 +93,6 @@ class UserCreate(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.post("/api/signup", response_model=Token)
 async def signup(user: UserCreate, db: mysql.connector.MySQLConnection = Depends(get_db)):
@@ -131,3 +168,37 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: mysql.conn
         expires_delta=timedelta(minutes=30)
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/api/qr/create")
+async def create_qr(url: str, current_user: str = Depends(get_current_user)):
+    try:
+        # Create QR code instance
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        
+        # Add data to QR code
+        qr.add_data(url)
+        qr.make(fit=True)
+
+        # Create image from QR code
+        qr_image = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert PIL image to base64 string
+        buffered = io.BytesIO()
+        qr_image.save(buffered, format="PNG")
+        qr_base64 = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Return the base64 encoded image
+        return {
+            "qr_code": f"data:image/png;base64,{qr_base64}",
+            "url": url
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

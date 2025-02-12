@@ -8,6 +8,11 @@
   background-color: #ffffff;
 }
 
+/* Add html element styling */
+html {
+  background-color: #f5f5f5; /* Match body background */
+}
+
 /* Remove the problematic flex and place-items */
 body {
   margin: 0;
