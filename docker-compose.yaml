@@ -1,10 +1,27 @@
 services:
+  database:
+    build: ./database
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: myapp
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=mysql://myuser:mypassword@database:3306/myapp
     restart: always
 
   frontend:
@@ -14,3 +31,6 @@ services:
     depends_on:
       - backend
     restart: always
+
+volumes:
+  mysql_data:

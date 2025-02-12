@@ -24,6 +24,7 @@ pydantic==2.10.6
 pydantic_core==2.27.2
 Pygments==2.19.1
 python-dotenv==1.0.1
+python-jose[cryptography]
 python-multipart==0.0.20
 PyYAML==6.0.2
 rich==13.9.4
@@ -38,3 +39,5 @@ uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.0.4
 websockets==14.2
+passlib[bcrypt]
+mysql-connector-python
