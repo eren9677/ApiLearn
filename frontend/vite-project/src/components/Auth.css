@@ -1,0 +1,104 @@
+/* Container for the authentication form */
+.auth-container {
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form title styling */
+.auth-title {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Form layout */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Input field styling */
+.auth-input {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Button styling */
+.auth-submit {
+  padding: 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.auth-submit:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+}
+
+/* Toggle button styling */
+.auth-toggle {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  background-color: transparent;
+  border: 1px solid #4a90e2;
+  color: #4a90e2;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  font-weight: 500;
+}
+
+.auth-toggle:hover {
+  background-color: #f5f5f5;
+}
+
+/* Error message styling */
+.auth-error {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  font-size: 0.875rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .auth-container {
+    width: 95%;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .auth-title {
+    font-size: 1.5rem;
+  }
+}

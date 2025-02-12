@@ -1,0 +1,146 @@
+/* Main dashboard container */
+.dashboard-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  padding: 2rem;
+}
+
+/* Header section with logout button */
+.dashboard-header {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+/* Logout button styling */
+.logout-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background-color: #d32f2f;
+  transform: translateY(-1px);
+}
+
+/* API section styling */
+.api-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.api-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Section title styling */
+.section-title {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Button styling */
+.api-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.api-button:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+}
+
+/* Input field styling */
+.api-input {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-right: 1rem;
+  width: 250px;
+  transition: all 0.3s ease;
+}
+
+.api-input:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Response display styling */
+.api-response {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  color: #333;
+  border: 1px solid #e9ecef;
+}
+
+/* Error message styling */
+.api-error {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .dashboard-container {
+    max-width: 900px;
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboard-container {
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .api-section {
+    padding: 1.5rem;
+  }
+
+  .api-input {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .dashboard-header {
+    position: static;
+    margin-bottom: 2rem;
+    text-align: right;
+  }
+} 
