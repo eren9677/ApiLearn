@@ -170,7 +170,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: mysql.conn
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/api/qr/create")
-async def create_qr(url: str, current_user: str = Depends(get_current_user)):
+async def create_qr(url: str, current_user: str = Depends(get_current_user), db: mysql.connector.MySQLConnection = Depends(get_db)):
     try:
         # Create QR code instance
         qr = qrcode.QRCode(
@@ -192,11 +192,75 @@ async def create_qr(url: str, current_user: str = Depends(get_current_user)):
         qr_image.save(buffered, format="PNG")
         qr_base64 = base64.b64encode(buffered.getvalue()).decode()
         
+        # Get user_id from username
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
+        user = cursor.fetchone()
+        
+        # Save QR code to database
+        cursor.execute(
+            "INSERT INTO qr_codes (user_id, qr_data) VALUES (%s, %s)",
+            (user['id'], url)
+        )
+        db.commit()
+        
         # Return the base64 encoded image
         return {
             "qr_code": f"data:image/png;base64,{qr_base64}",
             "url": url
         }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+@app.get("/api/qr")
+async def get_user_qr_codes(current_user: str = Depends(get_current_user), db: mysql.connector.MySQLConnection = Depends(get_db)):
+    try:
+        cursor = db.cursor(dictionary=True)
+        
+        # Get user_id from username
+        cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
+        user = cursor.fetchone()
+        
+        # Get all QR codes for the user
+        cursor.execute("""
+            SELECT qr_codes.id, qr_codes.qr_data as url, qr_codes.created_at
+            FROM qr_codes 
+            WHERE user_id = %s 
+            ORDER BY created_at DESC
+        """, (user['id'],))
+        
+        qr_codes = cursor.fetchall()
+        
+        # Generate QR code images for each record
+        for qr in qr_codes:
+            # Create QR code instance
+            qr_generator = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            
+            # Add data to QR code
+            qr_generator.add_data(qr['url'])
+            qr_generator.make(fit=True)
+            
+            # Create image from QR code
+            qr_image = qr_generator.make_image(fill_color="black", back_color="white")
+            
+            # Convert PIL image to base64 string
+            buffered = io.BytesIO()
+            qr_image.save(buffered, format="PNG")
+            qr_base64 = base64.b64encode(buffered.getvalue()).decode()
+            
+            # Add base64 image to the response
+            qr['qr_code'] = f"data:image/png;base64,{qr_base64}"
+        
+        return qr_codes
+        
     except Exception as e:
         raise HTTPException(
             status_code=500,
