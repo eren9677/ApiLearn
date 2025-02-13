@@ -39,7 +39,7 @@ function App() {
   const renderContent = () => {
     switch (currentPath) {
       case '/create-qr':
-        return <CreateQR />;
+        return <CreateQR onLogout={handleLogout} />;
       case '/manage-qr':
         // Add your ManageQR component here when ready
         return <div>Manage QR Codes (Coming Soon)</div>;

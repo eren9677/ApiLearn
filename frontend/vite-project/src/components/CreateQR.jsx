@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import './CreateQR.css';
 
-function CreateQR() {
+function CreateQR({ onLogout }) {
   // State management for URL input and QR code response
   const [url, setUrl] = useState('');
   const [qrCode, setQrCode] = useState(null);
@@ -70,6 +70,7 @@ function CreateQR() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         username={username}
+        onLogout={onLogout}
       />
 
       <div className="create-qr-container">
