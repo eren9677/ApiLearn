@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Auth from "./components/Auth";
 import Dashboard from "./components/Dashboard";
 import CreateQR from "./components/CreateQR";
+import ManageQR from "./components/ManageQR";
 import './App.css';
 
 function App() {
@@ -41,8 +42,7 @@ function App() {
       case '/create-qr':
         return <CreateQR onLogout={handleLogout} />;
       case '/manage-qr':
-        // Add your ManageQR component here when ready
-        return <div>Manage QR Codes (Coming Soon)</div>;
+        return <ManageQR onLogout={handleLogout} />;
       default:
         return <Dashboard onLogout={handleLogout} />;
     }

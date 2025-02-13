@@ -1,0 +1,89 @@
+import React, { useEffect, useState } from 'react';
+import Sidebar from './Sidebar';
+import './ManageQR.css';
+
+function ManageQR({ onLogout }) {
+  // State management for sidebar and QR codes
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [qrCodes, setQrCodes] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Get username from localStorage
+  const username = localStorage.getItem("username") || "User";
+
+  // Fetch user's QR codes on component mount
+  const fetchQRCodes = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/qr', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch QR codes');
+      const data = await response.json();
+      setQrCodes(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQRCodes();
+  }, []);
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  return (
+    <div className="dashboard-container">
+      {/* Sidebar Toggle Button */}
+      <button 
+        className="sidebar-toggle"
+        onClick={() => setIsSidebarOpen(true)}
+      >
+        ☰
+      </button>
+
+      {/* Sidebar Component */}
+      <Sidebar 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        username={username}
+        onLogout={onLogout}
+      />
+
+      <div className="manage-qr-container">
+        <h2>Manage Your QR Codes</h2>
+
+        {/* Error display */}
+        {error && <div className="error-message">{error}</div>}
+
+        {loading ? (
+          <div className="loading">Loading...</div>
+        ) : (
+          <div className="qr-codes-list">
+            {qrCodes.length > 0 ? (
+              qrCodes.map(qr => (
+                <div key={qr.id} className="qr-code-item">
+                  <img src={qr.qr_code} alt={`QR Code for ${qr.url}`} className="qr-image" />
+                  <div className="qr-info">
+                    <p className="qr-url">Link: <a href={qr.url} target="_blank" rel="noopener noreferrer">{qr.url}</a></p>
+                    <p className="qr-date">Created: {formatDate(qr.created_at)}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No QR codes generated yet.</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default ManageQR; 
