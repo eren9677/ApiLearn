@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import './ManageQR.css';
+import { FaDownload, FaTrash } from 'react-icons/fa';
 
 function ManageQR({ onLogout }) {
   // State management for sidebar and QR codes
@@ -38,6 +39,39 @@ function ManageQR({ onLogout }) {
     return new Date(dateString).toLocaleString();
   };
 
+  const handleDelete = async (qrId) => {
+    if (!window.confirm('Are you sure you want to delete this QR code?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/qr/${qrId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete QR code');
+      }
+
+      // Refresh the QR codes list
+      fetchQRCodes();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDownload = (qrCode, url) => {
+    const link = document.createElement('a');
+    link.href = qrCode;
+    link.download = `qr-code-${encodeURIComponent(url)}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="dashboard-container">
       {/* Sidebar Toggle Button */}
@@ -73,6 +107,22 @@ function ManageQR({ onLogout }) {
                   <div className="qr-info">
                     <p className="qr-url">Link: <a href={qr.url} target="_blank" rel="noopener noreferrer">{qr.url}</a></p>
                     <p className="qr-date">Created: {formatDate(qr.created_at)}</p>
+                    <div className="button-group">
+                      <button 
+                        onClick={() => handleDownload(qr.qr_code, qr.url)}
+                        className="action-button download-button"
+                        title="Download QR Code"
+                      >
+                        <FaDownload /> Download
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(qr.id)}
+                        className="action-button delete-button"
+                        title="Delete QR Code"
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))

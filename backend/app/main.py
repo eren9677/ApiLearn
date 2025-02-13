@@ -266,3 +266,43 @@ async def get_user_qr_codes(current_user: str = Depends(get_current_user), db: m
             status_code=500,
             detail=str(e)
         )
+
+@app.delete("/api/qr/{qr_id}")
+async def delete_qr_code(
+    qr_id: int, 
+    current_user: str = Depends(get_current_user), 
+    db: mysql.connector.MySQLConnection = Depends(get_db)
+):
+    try:
+        cursor = db.cursor(dictionary=True)
+        
+        # Get user_id from username
+        cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
+        user = cursor.fetchone()
+        
+        # Check if QR code exists and belongs to the user
+        cursor.execute("""
+            SELECT id FROM qr_codes 
+            WHERE id = %s AND user_id = %s
+        """, (qr_id, user['id']))
+        
+        qr_code = cursor.fetchone()
+        if not qr_code:
+            raise HTTPException(
+                status_code=404,
+                detail="QR code not found or you don't have permission to delete it"
+            )
+        
+        # Delete the QR code
+        cursor.execute("DELETE FROM qr_codes WHERE id = %s", (qr_id,))
+        db.commit()
+        
+        return {"message": "QR code deleted successfully"}
+        
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
