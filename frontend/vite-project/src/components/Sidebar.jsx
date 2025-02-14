@@ -40,6 +40,17 @@ function Sidebar({ isOpen, onClose, username, onLogout }) {
 
         {/* Sidebar navigation/actions */}
         <div className="sidebar-actions">
+          {/* Dashboard Section */}
+          <div className="sidebar-section">
+            <h4 className="sidebar-section-title">Navigation</h4>
+            <button 
+              className="sidebar-button" 
+              onClick={() => handleNavigation('/dashboard')}
+            >
+              Dashboard
+            </button>
+          </div>
+
           {/* QR Code Management Section */}
           <div className="sidebar-section">
             <h4 className="sidebar-section-title">QR Code Management</h4>
