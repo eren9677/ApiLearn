@@ -103,13 +103,13 @@ function ManageQR({ onLogout }) {
             {qrCodes.length > 0 ? (
               qrCodes.map(qr => (
                 <div key={qr.id} className="qr-code-item">
-                  <img src={qr.qr_code} alt={`QR Code for ${qr.url}`} className="qr-image" />
+                  <img src={`data:image/png;base64,${qr.qr_image}`} alt={`QR Code for ${qr.url}`} className="qr-image" />
                   <div className="qr-info">
                     <p className="qr-url">Link: <a href={qr.url} target="_blank" rel="noopener noreferrer">{qr.url}</a></p>
                     <p className="qr-date">Created: {formatDate(qr.created_at)}</p>
                     <div className="button-group">
                       <button 
-                        onClick={() => handleDownload(qr.qr_code, qr.url)}
+                        onClick={() => handleDownload(qr.qr_image, qr.url)}
                         className="action-button download-button"
                         title="Download QR Code"
                       >
