@@ -61,7 +61,7 @@ function Auth({ onLoginSuccess }) {
   return (
     // Main container for the auth form
     <div className="auth-container">
-      <h1 className="app-title">FastAPI & React Example</h1>
+      <h1 className="app-title">QR Code Generator</h1>
       {/* Form title that changes based on mode */}
       <h2 className="auth-title">
         {isSignup ? "Create Account" : "Welcome Back"}
