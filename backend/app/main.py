@@ -16,6 +16,17 @@ from qrcode.image.styles.colormasks import RadialGradiantColorMask, SolidFillCol
 from qrcode.image.styledpil import StyledPilImage
 import logging
 
+class RoundedEyeDrawer(RoundedModuleDrawer):
+    def draw(self, box, image, fill_color):
+        """
+        Draw a rounded rectangle for the QR eye using the given box dimensions.
+        This overrides the default square drawing.
+        """
+        draw = ImageDraw.Draw(image)
+        # Calculate a suitable radius based on the box size
+        radius = (box[2] - box[0]) // 4  # adjust this fraction as needed
+        draw.rounded_rectangle(box, radius=radius, fill=fill_color)
+
 # Constants for JWT
 SECRET_KEY = "your-secret-key-here"  # In production, use a secure secret key
 ALGORITHM = "HS256"
@@ -246,9 +257,14 @@ async def create_qr(
             "gapped": GappedSquareModuleDrawer()
         }
         
-        # Get module and eye drawers
+        # Get module drawer for dots
         module_drawer = style_mapping.get(options.dot_style)
-        eye_drawer = style_mapping.get(options.eye_style)
+        
+        # For eyes, if user selects "rounded", use our custom RoundedEyeDrawer; otherwise use default.
+        if options.eye_style == "rounded":
+            eye_drawer = RoundedEyeDrawer()
+        else:
+            eye_drawer = style_mapping.get(options.eye_style)
         
         if not module_drawer or not eye_drawer:
             logger.error(f"Invalid style - Dot: {options.dot_style}, Eye: {options.eye_style}")
