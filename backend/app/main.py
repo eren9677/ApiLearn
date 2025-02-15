@@ -214,124 +214,121 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: mysql.conn
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+# Added helper function to generate QR code image as base64. This function implements the QR drawing logic.
+def generate_qr_image(options: QRCodeOptions) -> str:
+    # Convert hex colors to RGB tuples
+    fill_color_rgb = hex_to_rgb(options.fill_color)
+    back_color_rgb = hex_to_rgb(options.back_color)
+    logger.debug(f"Converted colors - Fill: {fill_color_rgb}, Back: {back_color_rgb}")
+
+    # Create and configure QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(options.url)
+    qr.make(fit=True)
+
+    # Style configuration mapping for modules (dots)
+    style_mapping = {
+        "square": SquareModuleDrawer(),
+        "rounded": RoundedModuleDrawer(),
+        "circle": CircleModuleDrawer(),
+        "gapped": GappedSquareModuleDrawer()
+    }
+    module_drawer = style_mapping.get(options.dot_style)
+
+    # For eyes, if user selects "rounded", use our custom RoundedEyeDrawer; otherwise use default.
+    if options.eye_style == "rounded":
+        eye_drawer = RoundedEyeDrawer()
+    else:
+        eye_drawer = style_mapping.get(options.eye_style)
+
+    if not module_drawer or not eye_drawer:
+        logger.error(f"Invalid style - Dot: {options.dot_style}, Eye: {options.eye_style}")
+        raise HTTPException(status_code=400, detail="Invalid style options")
+
+    logger.debug(f"Using styles - Module: {type(module_drawer).__name__}, Eye: {type(eye_drawer).__name__}")
+
+    # Generate the QR code image with styling
+    try:
+        qr_image = qr.make_image(
+            image_factory=StyledPilImage,
+            module_drawer=module_drawer,
+            eye_drawer=eye_drawer,
+            color_mask=SolidFillColorMask(
+                front_color=fill_color_rgb,
+                back_color=back_color_rgb
+            )
+        )
+    except Exception as img_error:
+        logger.error(f"QR generation error: {str(img_error)}")
+        raise HTTPException(status_code=500, detail="QR generation failed")
+
+    # Convert QR image to base64 string
+    try:
+        buffered = io.BytesIO()
+        qr_image.save(buffered, format="PNG")
+        qr_base64 = base64.b64encode(buffered.getvalue()).decode()
+    except Exception as conv_error:
+        logger.error(f"Base64 conversion failed: {str(conv_error)}")
+        raise HTTPException(status_code=500, detail="Failed to convert QR image")
+
+    return qr_base64
+
+# Endpoint to generate QR code without saving to the database
 @app.post("/api/qr/create")
-async def create_qr(
+async def generate_qr(
+    options: QRCodeOptions,
+    current_user: str = Depends(get_current_user)
+):
+    # Note: This endpoint only returns the generated QR code.
+    qr_base64 = generate_qr_image(options)
+    return {
+        "qr_code": f"data:image/png;base64,{qr_base64}",
+        "url": options.url
+    }
+
+# New endpoint to save the generated QR code to the database
+@app.post("/api/qr/save")
+async def save_qr(
     options: QRCodeOptions,
     current_user: str = Depends(get_current_user),
     db: mysql.connector.MySQLConnection = Depends(get_db)
 ):
-    """Create a QR code with custom styling options"""
+    # Generate QR code using the same logic
+    qr_base64 = generate_qr_image(options)
     
-    # Add detailed request logging
-    logger.debug("=== QR Code Creation Request ===")
-    logger.debug(f"User: {current_user}")
-    logger.debug(f"Options: {options.dict()}")
-    
+    # Database operations to save QR code only when explicitly requested
     try:
-        # Validate color format
-        try:
-            fill_color_rgb = hex_to_rgb(options.fill_color)
-            back_color_rgb = hex_to_rgb(options.back_color)
-            logger.debug(f"Converted colors - Fill: {fill_color_rgb}, Back: {back_color_rgb}")
-        except ValueError as e:
-            logger.error(f"Color conversion failed: {str(e)}")
-            raise HTTPException(status_code=400, detail="Invalid color format")
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
+        user = cursor.fetchone()
 
-        # Create and configure QR code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
+        if not user:
+            logger.error(f"User not found: {current_user}")
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Save QR code data to the database
+        cursor.execute(
+            """INSERT INTO qr_codes 
+               (user_id, qr_data, dot_style, fill_color, back_color, qr_image, eye_style) 
+               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (user['id'], options.url, options.dot_style, options.fill_color, options.back_color, qr_base64, options.eye_style)
         )
-        
-        # Add URL data
-        qr.add_data(options.url)
-        qr.make(fit=True)
-        
-        # Style configuration
-        style_mapping = {
-            "square": SquareModuleDrawer(),
-            "rounded": RoundedModuleDrawer(),
-            "circle": CircleModuleDrawer(),
-            "gapped": GappedSquareModuleDrawer()
-        }
-        
-        # Get module drawer for dots
-        module_drawer = style_mapping.get(options.dot_style)
-        
-        # For eyes, if user selects "rounded", use our custom RoundedEyeDrawer; otherwise use default.
-        if options.eye_style == "rounded":
-            eye_drawer = RoundedEyeDrawer()
-        else:
-            eye_drawer = style_mapping.get(options.eye_style)
-        
-        if not module_drawer or not eye_drawer:
-            logger.error(f"Invalid style - Dot: {options.dot_style}, Eye: {options.eye_style}")
-            raise HTTPException(status_code=400, detail="Invalid style options")
-        
-        logger.debug(f"Using styles - Module: {type(module_drawer).__name__}, Eye: {type(eye_drawer).__name__}")
-        
-        try:
-            # Generate QR code image
-            qr_image = qr.make_image(
-                image_factory=StyledPilImage,
-                module_drawer=module_drawer,
-                eye_drawer=eye_drawer,
-                color_mask=SolidFillColorMask(
-                    front_color=fill_color_rgb,
-                    back_color=back_color_rgb
-                )
-            )
-        except Exception as img_error:
-            logger.error(f"QR image generation failed: {str(img_error)}")
-            raise HTTPException(status_code=500, detail="Failed to generate QR image")
+        db.commit()
+        logger.debug("QR code saved to database successfully")
+    except Exception as db_error:
+        logger.error(f"Database operation failed: {str(db_error)}")
+        raise HTTPException(status_code=500, detail="Database operation failed")
 
-        # Convert to base64
-        try:
-            buffered = io.BytesIO()
-            qr_image.save(buffered, format="PNG")
-            qr_base64 = base64.b64encode(buffered.getvalue()).decode()
-        except Exception as conv_error:
-            logger.error(f"Base64 conversion failed: {str(conv_error)}")
-            raise HTTPException(status_code=500, detail="Failed to convert QR image")
-
-        # Database operations
-        try:
-            cursor = db.cursor(dictionary=True)
-            cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
-            user = cursor.fetchone()
-            
-            if not user:
-                logger.error(f"User not found: {current_user}")
-                raise HTTPException(status_code=404, detail="User not found")
-            
-            # Save QR code to database
-            cursor.execute(
-                """INSERT INTO qr_codes 
-                   (user_id, qr_data, dot_style, fill_color, back_color, qr_image, eye_style) 
-                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (user['id'], options.url, options.dot_style, 
-                 options.fill_color, options.back_color, qr_base64, options.eye_style)
-            )
-            db.commit()
-            logger.debug("QR code saved to database successfully")
-            
-        except Exception as db_error:
-            logger.error(f"Database operation failed: {str(db_error)}")
-            raise HTTPException(status_code=500, detail="Database operation failed")
-
-        # Return success response
-        return {
-            "qr_code": f"data:image/png;base64,{qr_base64}",
-            "url": options.url
-        }
-
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+    return {
+        "qr_code": f"data:image/png;base64,{qr_base64}",
+        "url": options.url,
+        "message": "QR code saved successfully"
+    }
 
 @app.get("/api/qr")
 async def get_user_qr_codes(current_user: str = Depends(get_current_user), db: mysql.connector.MySQLConnection = Depends(get_db)):

@@ -38,12 +38,13 @@ function CreateQR({ onLogout }) {
     { value: 'gapped', label: 'Gapped Square' }
   ];
 
-  // Function to handle QR code generation
+  // Function to handle QR code generation (does not save to database)
   const handleGenerateQR = async () => {
     setError('');
     setIsLoading(true);
 
     try {
+      // Call the generate endpoint to obtain the QR code image
       const response = await fetch('http://localhost:8000/api/qr/create', {
         method: 'POST',
         headers: {
@@ -74,7 +75,46 @@ function CreateQR({ onLogout }) {
     }
   };
 
-  // Function to handle QR code download
+  // Function to handle saving the QR code to the database; called only when user clicks the "Save QR" button.
+  const handleSaveQR = async () => {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Call the save endpoint with the same QR customization options
+      const response = await fetch('http://localhost:8000/api/qr/save', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url,
+          dot_style: dotStyle,
+          fill_color: fillColor,
+          back_color: backColor,
+          eye_style: eyeStyle
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save QR code');
+      }
+
+      const data = await response.json();
+      // Optionally, you can update the displayed QR code with the saved one
+      setQrCode(data.qr_code);
+      alert(data.message);
+    } catch (err) {
+      setError(err.message === 'Failed to save QR code' 
+        ? 'Failed to save QR code. Please try again.' 
+        : 'Unexpected error occurred while saving.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle QR code download remains unchanged
   const handleDownload = () => {
     if (qrCode) {
       const link = document.createElement('a');
@@ -187,13 +227,23 @@ function CreateQR({ onLogout }) {
           </div>
         </div>
 
-        <button 
-          onClick={handleGenerateQR}
-          disabled={isLoading}
-          className="generate-button"
-        >
-          {isLoading ? 'Generating...' : 'Generate QR'}
-        </button>
+        <div className="button-group">
+          <button 
+            onClick={handleGenerateQR}
+            disabled={isLoading}
+            className="generate-button"
+          >
+            {isLoading ? 'Generating...' : 'Generate QR'}
+          </button>
+          {/* New Save QR button - saves the generated QR code to the database */}
+          <button 
+            onClick={handleSaveQR}
+            disabled={isLoading || !qrCode}
+            className="save-button"
+          >
+            {isLoading ? 'Saving...' : 'Save QR'}
+          </button>
+        </div>
 
         {error && <div className="error-message">{error}</div>}
 
@@ -201,7 +251,7 @@ function CreateQR({ onLogout }) {
           <div className="qr-result">
             <img src={qrCode} alt="Generated QR Code" className="qr-image" />
             <button onClick={handleDownload} className="download-button">
-              Download QR
+              Download
             </button>
           </div>
         )}
