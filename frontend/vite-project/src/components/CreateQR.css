@@ -179,3 +179,19 @@
   margin-bottom: 1rem;
   text-align: center;
 }
+
+/* Save success indicator styling */
+.save-success {
+  color: green; /* Green color for success */
+  font-size: 20px; /* Slightly larger for visibility */
+  margin-left: 10px; /* Spacing from the save button */
+  display: inline-block;
+  animation: fadeOut 1s forwards;
+}
+
+/* Optional fadeOut animation, if you want a fade effect */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}

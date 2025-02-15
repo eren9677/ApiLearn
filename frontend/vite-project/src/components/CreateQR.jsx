@@ -4,18 +4,19 @@ import { HexColorPicker } from 'react-colorful';
 import './CreateQR.css';
 
 function CreateQR({ onLogout }) {
-  // State management for URL input and QR code response
+  // State management for URL input, QR response, and indicator states
   const [url, setUrl] = useState('');
   const [qrCode, setQrCode] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+  const [saveSuccess, setSaveSuccess] = useState(false); // State for save indicator
+
   // State for QR code customization
   const [dotStyle, setDotStyle] = useState('square');
   const [fillColor, setFillColor] = useState('#000000');
   const [backColor, setBackColor] = useState('#FFFFFF');
-  const [eyeStyle, setEyeStyle] = useState('square');  // New state for eye style
+  const [eyeStyle, setEyeStyle] = useState('square');  // State for eye style
   const [showFillPicker, setShowFillPicker] = useState(false);
   const [showBackPicker, setShowBackPicker] = useState(false);
 
@@ -42,9 +43,7 @@ function CreateQR({ onLogout }) {
   const handleGenerateQR = async () => {
     setError('');
     setIsLoading(true);
-
     try {
-      // Call the generate endpoint to obtain the QR code image
       const response = await fetch('http://localhost:8000/api/qr/create', {
         method: 'POST',
         headers: {
@@ -59,11 +58,9 @@ function CreateQR({ onLogout }) {
           eye_style: eyeStyle  // Include eye style in request
         })
       });
-
       if (!response.ok) {
         throw new Error('Failed to generate QR code');
       }
-
       const data = await response.json();
       setQrCode(data.qr_code);
     } catch (err) {
@@ -75,13 +72,11 @@ function CreateQR({ onLogout }) {
     }
   };
 
-  // Function to handle saving the QR code to the database; called only when user clicks the "Save QR" button.
+  // Function to handle saving the QR code to the database; triggered by the "Save QR" button.
   const handleSaveQR = async () => {
     setError('');
     setIsLoading(true);
-
     try {
-      // Call the save endpoint with the same QR customization options
       const response = await fetch('http://localhost:8000/api/qr/save', {
         method: 'POST',
         headers: {
@@ -96,15 +91,16 @@ function CreateQR({ onLogout }) {
           eye_style: eyeStyle
         })
       });
-
       if (!response.ok) {
         throw new Error('Failed to save QR code');
       }
-
       const data = await response.json();
-      // Optionally, you can update the displayed QR code with the saved one
       setQrCode(data.qr_code);
-      alert(data.message);
+      // Set the saveSuccess indicator to true and remove it after 1 second
+      setSaveSuccess(true);
+      setTimeout(() => {
+         setSaveSuccess(false);
+      }, 1000);
     } catch (err) {
       setError(err.message === 'Failed to save QR code' 
         ? 'Failed to save QR code. Please try again.' 
@@ -114,7 +110,6 @@ function CreateQR({ onLogout }) {
     }
   };
 
-  // Function to handle QR code download remains unchanged
   const handleDownload = () => {
     if (qrCode) {
       const link = document.createElement('a');
@@ -174,7 +169,7 @@ function CreateQR({ onLogout }) {
           </div>
 
           <div className="option-group">
-            <label>Eye Style:</label>  {/* New dropdown for eye style */}
+            <label>Eye Style:</label> {/* New dropdown for eye style */}
             <select 
               value={eyeStyle}
               onChange={(e) => setEyeStyle(e.target.value)}
@@ -235,7 +230,7 @@ function CreateQR({ onLogout }) {
           >
             {isLoading ? 'Generating...' : 'Generate QR'}
           </button>
-          {/* New Save QR button - saves the generated QR code to the database */}
+          {/* Save QR button with temporary success indicator */}
           <button 
             onClick={handleSaveQR}
             disabled={isLoading || !qrCode}
@@ -243,6 +238,7 @@ function CreateQR({ onLogout }) {
           >
             {isLoading ? 'Saving...' : 'Save QR'}
           </button>
+          {saveSuccess && <span className="save-success">&#10003;</span>}
         </div>
 
         {error && <div className="error-message">{error}</div>}
