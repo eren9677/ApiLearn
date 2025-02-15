@@ -28,7 +28,9 @@ function CreateQR({ onLogout }) {
     { value: 'square', label: 'Square' },
     { value: 'rounded', label: 'Rounded' },
     { value: 'circle', label: 'Circle' },
-    { value: 'gapped', label: 'Gapped Square' }
+    { value: 'gapped', label: 'Gapped Square' },
+    { value: 'horizontal', label: 'Horizontal' },
+    { value: 'vertical', label: 'Vertical' }
   ];
 
   // Available eye styles
@@ -36,7 +38,8 @@ function CreateQR({ onLogout }) {
     { value: 'square', label: 'Square' },
     { value: 'rounded', label: 'Rounded' },
     { value: 'circle', label: 'Circle' },
-    { value: 'gapped', label: 'Gapped Square' }
+    { value: 'gapped', label: 'Gapped Square' },
+    { value: 'custom', label: 'Complete Circle' }
   ];
 
   // Function to handle QR code generation (does not save to database)

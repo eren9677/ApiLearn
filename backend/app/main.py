@@ -14,6 +14,188 @@ from jose import JWTError, jwt
 from qrcode.image.styles.moduledrawers import RoundedModuleDrawer, CircleModuleDrawer, SquareModuleDrawer, GappedSquareModuleDrawer
 from qrcode.image.styles.colormasks import RadialGradiantColorMask, SolidFillColorMask, SquareGradiantColorMask, HorizontalGradiantColorMask, VerticalGradiantColorMask
 from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.moduledrawers.pil import RoundedModuleDrawer
+
+
+##### custom rounded eye factory.
+
+import abc
+from typing import TYPE_CHECKING, Any, Union
+from qrcode.image.styles.colormasks import SolidFillColorMask
+from qrcode.image.styles.moduledrawers.pil import HorizontalBarsDrawer, VerticalBarsDrawer
+from qrcode.main import QRCode
+
+if TYPE_CHECKING:
+    from qrcode.image.base import BaseImage
+    from qrcode.main import ActiveWithNeighbors, QRCode
+
+
+class BaseEyeDrawer(abc.ABC):
+    needs_processing = True
+    needs_neighbors = False
+    factory: "StyledPilImage2"
+
+    def initialize(self, img: "BaseImage") -> None:
+        self.img = img
+
+    def draw(self):
+        (nw_eye_top, _), (_, nw_eye_bottom) = (
+            self.factory.pixel_box(0, 0),
+            self.factory.pixel_box(6, 6),
+        )
+        (nw_eyeball_top, _), (_, nw_eyeball_bottom) = (
+            self.factory.pixel_box(2, 2),
+            self.factory.pixel_box(4, 4),
+        )
+        self.draw_nw_eye((nw_eye_top, nw_eye_bottom))
+        self.draw_nw_eyeball((nw_eyeball_top, nw_eyeball_bottom))
+
+        (ne_eye_top, _), (_, ne_eye_bottom) = (
+            self.factory.pixel_box(0, self.factory.width - 7),
+            self.factory.pixel_box(6, self.factory.width - 1),
+        )
+        (ne_eyeball_top, _), (_, ne_eyeball_bottom) = (
+            self.factory.pixel_box(2, self.factory.width - 5),
+            self.factory.pixel_box(4, self.factory.width - 3),
+        )
+        self.draw_ne_eye((ne_eye_top, ne_eye_bottom))
+        self.draw_ne_eyeball((ne_eyeball_top, ne_eyeball_bottom))
+
+        (sw_eye_top, _), (_, sw_eye_bottom) = (
+            self.factory.pixel_box(self.factory.width - 7, 0),
+            self.factory.pixel_box(self.factory.width - 1, 6),
+        )
+        (sw_eyeball_top, _), (_, sw_eyeball_bottom) = (
+            self.factory.pixel_box(self.factory.width - 5, 2),
+            self.factory.pixel_box(self.factory.width - 3, 4),
+        )
+        self.draw_sw_eye((sw_eye_top, sw_eye_bottom))
+        self.draw_sw_eyeball((sw_eyeball_top, sw_eyeball_bottom))
+
+    @abc.abstractmethod
+    def draw_nw_eye(self, position): ...
+
+    @abc.abstractmethod
+    def draw_nw_eyeball(self, position): ...
+
+    @abc.abstractmethod
+    def draw_ne_eye(self, position): ...
+
+    @abc.abstractmethod
+    def draw_ne_eyeball(self, position): ...
+
+    @abc.abstractmethod
+    def draw_sw_eye(self, position): ...
+
+    @abc.abstractmethod
+    def draw_sw_eyeball(self, position): ...
+
+
+class CustomEyeDrawer(BaseEyeDrawer):
+    def draw_nw_eye(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=None,
+            width=self.factory.box_size,
+            outline="black",
+            radius=self.factory.box_size * 2,
+            corners=[True, True, True, True],
+        )
+
+    def draw_nw_eyeball(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=True,
+            outline="black",
+            radius=self.factory.box_size,
+            corners=[True, True, True, True],
+        )
+
+    def draw_ne_eye(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=None,
+            width=self.factory.box_size,
+            outline="black",
+            radius=self.factory.box_size * 2,
+            corners=[True, True, True, True],
+        )
+
+    def draw_ne_eyeball(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=True,
+            outline="black",
+            radius=self.factory.box_size,
+            corners=[True, True, True, True],
+        )
+
+    def draw_sw_eye(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=None,
+            width=self.factory.box_size,
+            outline="black",
+            radius=self.factory.box_size * 2,
+            corners=[True, True, True, True],
+        )
+
+    def draw_sw_eyeball(self, position):
+        draw = ImageDraw.Draw(self.img)
+        draw.rounded_rectangle(
+            position,
+            fill=True,
+            outline="black",
+            radius=self.factory.box_size,
+            corners=[True, True, True, True],
+        )
+
+
+class StyledPilImage2(StyledPilImage):
+    def drawrect_context(self, row: int, col: int, qr: QRCode[Any]):
+        box = self.pixel_box(row, col)
+        if self.is_eye(row, col):
+            drawer = self.eye_drawer
+            if getattr(self.eye_drawer, "needs_processing", False):
+                return
+        else:
+            drawer = self.module_drawer
+
+        is_active: Union[bool, ActiveWithNeighbors] = (
+            qr.active_with_neighbors(row, col)
+            if drawer.needs_neighbors
+            else bool(qr.modules[row][col])
+        )
+
+        drawer.drawrect(box, is_active)
+
+    def process(self) -> None:
+        if getattr(self.eye_drawer, "needs_processing", False):
+            self.eye_drawer.factory = self
+            self.eye_drawer.draw()
+        super().process()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import logging
 
 class RoundedEyeDrawer(RoundedModuleDrawer):
@@ -26,6 +208,7 @@ class RoundedEyeDrawer(RoundedModuleDrawer):
         # Calculate a suitable radius based on the box size
         radius = (box[2] - box[0]) // 4  # adjust this fraction as needed
         draw.rounded_rectangle(box, radius=radius, fill=fill_color)
+
 
 # Constants for JWT
 SECRET_KEY = "your-secret-key-here"  # In production, use a secure secret key
@@ -134,10 +317,10 @@ class QRCodeOptions(BaseModel):
         eye_style (str): Style of QR code eyes (square, rounded, circle, gapped)
     """
     url: str
-    dot_style: str = Field("square", pattern="^(square|rounded|circle|gapped)$")
+    dot_style: str = Field("square", pattern="^(square|rounded|circle|gapped|horizontal|vertical)$")
     fill_color: str = Field(..., pattern="^#[0-9A-Fa-f]{6}$")
     back_color: str = Field(..., pattern="^#[0-9A-Fa-f]{6}$")
-    eye_style: str = Field("square", pattern="^(square|rounded|circle|gapped)$")
+    eye_style: str = Field("square", pattern="^(square|rounded|circle|gapped|custom)$")
 
 @app.post("/api/signup", response_model=Token)
 async def signup(user: UserCreate, db: mysql.connector.MySQLConnection = Depends(get_db)):
@@ -236,15 +419,20 @@ def generate_qr_image(options: QRCodeOptions) -> str:
         "square": SquareModuleDrawer(),
         "rounded": RoundedModuleDrawer(),
         "circle": CircleModuleDrawer(),
-        "gapped": GappedSquareModuleDrawer()
+        "gapped": GappedSquareModuleDrawer(),
+        "horizontal": HorizontalBarsDrawer(),
+        "vertical": VerticalBarsDrawer(),
     }
     module_drawer = style_mapping.get(options.dot_style)
 
-    # For eyes, if user selects "rounded", use our custom RoundedEyeDrawer; otherwise use default.
-    if options.eye_style == "rounded":
-        eye_drawer = RoundedEyeDrawer()
-    else:
-        eye_drawer = style_mapping.get(options.eye_style)
+    eye_style_mapping = {
+        "square": SquareModuleDrawer(),
+        "rounded": RoundedModuleDrawer(),
+        "circle": CircleModuleDrawer(),
+        "gapped": GappedSquareModuleDrawer(),
+        "custom": CustomEyeDrawer(),
+    }
+    eye_drawer = eye_style_mapping.get(options.eye_style)
 
     if not module_drawer or not eye_drawer:
         logger.error(f"Invalid style - Dot: {options.dot_style}, Eye: {options.eye_style}")
@@ -255,7 +443,7 @@ def generate_qr_image(options: QRCodeOptions) -> str:
     # Generate the QR code image with styling
     try:
         qr_image = qr.make_image(
-            image_factory=StyledPilImage,
+            image_factory=StyledPilImage2,
             module_drawer=module_drawer,
             eye_drawer=eye_drawer,
             color_mask=SolidFillColorMask(
