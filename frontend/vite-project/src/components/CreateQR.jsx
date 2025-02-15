@@ -146,7 +146,7 @@ function CreateQR({ onLogout }) {
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter URL to generate QR code"
+            placeholder="Enter URL or Text to generate QR code"
             className="url-input"
           />
         </div>
