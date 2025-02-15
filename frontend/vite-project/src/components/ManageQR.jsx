@@ -63,10 +63,21 @@ function ManageQR({ onLogout }) {
     }
   };
 
+  // Updated handleDownload function to ensure proper data URI is used for the QR code image
   const handleDownload = (qrCode, url) => {
+    // Check if the qrCode string already contains the data URI prefix
+    // If not, prepend it.
+    const dataUri = qrCode.startsWith('data:') 
+      ? qrCode 
+      : `data:image/png;base64,${qrCode}`;
+    
+    // Create a temporary link element for triggering the download
     const link = document.createElement('a');
-    link.href = qrCode;
+    link.href = dataUri;
+    // Encode url to safely use it in the file name, and set file extension to .png
     link.download = `qr-code-${encodeURIComponent(url)}.png`;
+    
+    // Append the link, trigger click, and then remove the link from the document
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -136,4 +147,4 @@ function ManageQR({ onLogout }) {
   );
 }
 
-export default ManageQR; 
+export default ManageQR;
