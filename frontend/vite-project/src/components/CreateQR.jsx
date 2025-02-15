@@ -15,6 +15,7 @@ function CreateQR({ onLogout }) {
   const [dotStyle, setDotStyle] = useState('square');
   const [fillColor, setFillColor] = useState('#000000');
   const [backColor, setBackColor] = useState('#FFFFFF');
+  const [eyeStyle, setEyeStyle] = useState('square');  // New state for eye style
   const [showFillPicker, setShowFillPicker] = useState(false);
   const [showBackPicker, setShowBackPicker] = useState(false);
 
@@ -23,6 +24,14 @@ function CreateQR({ onLogout }) {
 
   // Available dot styles
   const dotStyles = [
+    { value: 'square', label: 'Square' },
+    { value: 'rounded', label: 'Rounded' },
+    { value: 'circle', label: 'Circle' },
+    { value: 'gapped', label: 'Gapped Square' }
+  ];
+
+  // Available eye styles
+  const eyeStyles = [
     { value: 'square', label: 'Square' },
     { value: 'rounded', label: 'Rounded' },
     { value: 'circle', label: 'Circle' },
@@ -45,7 +54,8 @@ function CreateQR({ onLogout }) {
           url,
           dot_style: dotStyle,
           fill_color: fillColor,
-          back_color: backColor
+          back_color: backColor,
+          eye_style: eyeStyle  // Include eye style in request
         })
       });
 
@@ -124,6 +134,21 @@ function CreateQR({ onLogout }) {
           </div>
 
           <div className="option-group">
+            <label>Eye Style:</label>  {/* New dropdown for eye style */}
+            <select 
+              value={eyeStyle}
+              onChange={(e) => setEyeStyle(e.target.value)}
+              className="style-select"
+            >
+              {eyeStyles.map(style => (
+                <option key={style.value} value={style.value}>
+                  {style.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="option-group">
             <label>QR Code Color:</label>
             <div className="color-picker-container">
               <button 
@@ -185,4 +210,4 @@ function CreateQR({ onLogout }) {
   );
 }
 
-export default CreateQR; 
+export default CreateQR;

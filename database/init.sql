@@ -22,5 +22,8 @@ CREATE TABLE IF NOT EXISTS qr_codes (
 
 ALTER TABLE qr_codes ADD COLUMN qr_image TEXT;
 
+-- Add eye_style column to qr_codes table
+ALTER TABLE qr_codes ADD COLUMN eye_style VARCHAR(20) DEFAULT 'square';
+
 -- Remove or update the initial insert since we need a proper password hash
--- It's better to create users through the application interface 
+-- It's better to create users through the application interface
