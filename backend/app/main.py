@@ -187,15 +187,6 @@ class StyledPilImage2(StyledPilImage):
 
 
 
-
-
-
-
-
-
-
-
-
 import logging
 
 class RoundedEyeDrawer(RoundedModuleDrawer):
@@ -211,7 +202,7 @@ class RoundedEyeDrawer(RoundedModuleDrawer):
 
 
 # Constants for JWT
-SECRET_KEY = "your-secret-key-here"  # In production, use a secure secret key
+SECRET_KEY = "your-secret-key-here"  # In production, use a secure secret key an put them in environment variables
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
