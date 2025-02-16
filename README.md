@@ -41,4 +41,4 @@ Once the containers are running, you can access:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the ApacheV2 License - see the [LICENSE](LICENSE) file for details.
