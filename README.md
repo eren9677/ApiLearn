@@ -39,6 +39,3 @@ Once the containers are running, you can access:
 - Frontend: [http://localhost:5173](http://localhost:5173)
 - Backend API: [http://localhost:8000](http://localhost:8000)
 
-## License
-
-This project is licensed under the ApacheV2 License - see the [LICENSE](LICENSE) file for details.
