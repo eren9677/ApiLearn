@@ -38,7 +38,6 @@ Once the containers are running, you can access:
 
 - Frontend: [http://localhost:5173](http://localhost:5173)
 - Backend API: [http://localhost:8000](http://localhost:8000)
-- API Documentation: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## License
 
