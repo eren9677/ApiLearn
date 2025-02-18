@@ -12,7 +12,8 @@ A full-stack web application for generating, customizing, and managing QR codes.
 - 💾 Save and manage QR codes
 - ⬇️ Download QR codes as PNG
 - 🎯 Real-time preview
-
+  
+Checkout this link to see the [![QrGenerate demonstration video](https://img.youtube.com/vi/OdBWeMerRV0/0.jpg)](https://www.youtube.com/watch?v=OdBWeMerRV0)
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
