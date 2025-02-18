@@ -16,7 +16,7 @@ A full-stack web application for generating, customizing, and managing QR codes.
 ## Demonstration Video
 
 
-[![QrGenerate demonstration video](https://img.youtube.com/vi/6x6Bq847SYo/0.jpg)](https://www.youtube.com/watch?v=6x6Bq847SYo)
+[![QrGenerate demonstration video](https://img.youtube.com/vi/6x6Bq847SYo/hqdefault.jpg)](https://www.youtube.com/watch?v=6x6Bq847SYo)
 
 ## Prerequisites
 
